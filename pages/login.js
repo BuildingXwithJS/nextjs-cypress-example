@@ -1,6 +1,7 @@
+import ky from 'ky/umd';
 import React, { useRef, useState } from 'react';
 
-const LoginForm = ({ onAuthorized }) => {
+const LoginForm = ({ onAuthorized, onError }) => {
   const loginRef = useRef();
   const passRef = useRef();
 
@@ -8,37 +9,29 @@ const LoginForm = ({ onAuthorized }) => {
     const login = loginRef.current.value;
     const password = passRef.current.value;
 
-    const loginResult = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ login, password })
-    }).then(r => r.json());
+    try {
+      const loginResult = await ky
+        .post('/api/login', { json: { login, password } })
+        .json();
 
-    onAuthorized(loginResult);
+      onAuthorized(loginResult);
+    } catch (e) {
+      onError(e);
+    }
   };
 
   return (
     <div>
       <div>
-        <input
-          type="text"
-          placeholder="Login"
-          defaultValue="yamalight"
-          ref={loginRef}
-        />
+        <input id="login" type="text" placeholder="Login" ref={loginRef} />
       </div>
       <div>
-        <input
-          type="password"
-          placeholder="Password"
-          defaultValue="123"
-          ref={passRef}
-        />
+        <input id="pass" type="password" placeholder="Password" ref={passRef} />
       </div>
       <div>
-        <button onClick={doLogin}>Login</button>
+        <button id="dologin" onClick={doLogin}>
+          Login
+        </button>
       </div>
     </div>
   );
@@ -46,15 +39,22 @@ const LoginForm = ({ onAuthorized }) => {
 
 function LoginPage() {
   const [user, setUser] = useState();
+  const [error, setError] = useState();
 
   return (
     <div>
-      {!user && <LoginForm onAuthorized={newUser => setUser(newUser)} />}
+      {!user && (
+        <LoginForm
+          onAuthorized={newUser => setUser(newUser)}
+          onError={newError => setError(newError)}
+        />
+      )}
       {user && (
         <div>
           <h1>Hello {user.login}!</h1>
         </div>
       )}
+      {error && <div style={{ color: 'red' }}>{error.toString()}</div>}
     </div>
   );
 }
