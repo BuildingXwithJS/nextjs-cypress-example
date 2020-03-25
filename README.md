@@ -2,7 +2,7 @@
 
 > Free open-source tutorial on creating a simple E2E tests for Next.js app with Cypress.io
 
-This repository contains code and related materials for [Cypress.io with Next.js]() video.
+This repository contains code and related materials for [Cypress.io with Next.js](https://youtu.be/B8_OGj_yNv0) video.
 
 ## Project description
 
